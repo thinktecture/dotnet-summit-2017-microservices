@@ -1,7 +1,4 @@
-﻿using System;
-using Topshelf;
-
-namespace MyOrdersAppService
+﻿namespace MyOrdersAppService
 {
     class Program
     {
