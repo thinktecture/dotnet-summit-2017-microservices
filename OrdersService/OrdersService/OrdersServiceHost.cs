@@ -11,11 +11,12 @@ namespace OrdersService
     {
         private string _baseUrl = "http://localhost:7777";
 
-        public IDisposable _server { get; set; }
+        private IDisposable _server { get; set; }
 
         public void Start()
         {
             _server = WebApp.Start<Startup>(_baseUrl);
+
             Console.WriteLine("Order Service running...");
         }
 
