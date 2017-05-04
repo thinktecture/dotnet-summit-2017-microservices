@@ -1,0 +1,32 @@
+{
+  "name": "shipping-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "run": "nodemon --exec ts-node app/app.ts",
+    "start": "tsc",
+    "build": "tsc",
+    "package": "npm run build && enclose server.js && move server.exe ShippingService.exe"
+  },
+  "dependencies": {
+    "@types/bluebird": "3.5.2",
+    "@types/consul": "0.23.31",
+    "@types/node": "7.0.4",
+    "@types/node-uuid": "0.0.28",
+    "@types/restify": "2.0.38",
+    "consul": "0.28.0",
+    "easynodeq": "0.2.8",
+    "node-uuid": "^1.4.8",
+    "restify": "4.3.0"
+  },
+  "devDependencies": {
+    "enclose": "^2.2.0",
+    "nexe": "^1.1.2",
+    "nodemon": "1.11.0",
+    "ts-node": "2.0.0",
+    "typescript": "2.0.3"
+  }
+}

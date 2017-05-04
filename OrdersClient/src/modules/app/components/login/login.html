@@ -1,0 +1,12 @@
+<div class="login-page">
+  <div class="login-form">
+    <form role="form" (ngSubmit)="submit()" #loginForm="ngForm">
+      <h1>Sign In</h1>
+      <input type="text" class="form-control" id="username" required [(ngModel)]="username" name="username" placeholder="Username...">
+      <br/>
+      <input type="password" class="form-control" id="password" required [(ngModel)]="password" name="password" placeholder="Password...">
+      <br/>
+      <button type="submit" class="btn btn-primary" [disabled]="!loginForm.form.valid">Login</button>
+    </form>
+  </div>
+</div>
