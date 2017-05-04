@@ -488,13 +488,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logging\MessageHandler.cs" />
-    <Compile Include="Controllers\HealthController.cs" />
-    <Compile Include="DTOs\Order.cs" />
-    <Compile Include="DTOs\OrderItem.cs" />
-    <Compile Include="Controllers\OrdersController.cs" />
-    <Compile Include="Hubs\OrdersHub.cs" />
     <Compile Include="Logging\MessageLoggingHandler.cs" />
-    <Compile Include="OrdersServiceHost.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -502,8 +496,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="SignalRAuthorizationMiddleware.cs" />
-    <Compile Include="Startup.cs" />
+    <Compile Include="AuthZ\SignalRAuthorizationMiddleware.cs" />
     <Compile Include="Discovery\CustomWebApiRegistryTenant.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -526,6 +519,11 @@
       <Project>{8a7eebc6-858c-4fef-8f13-17480c5a4c9e}</Project>
       <Name>QueuingMessages</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Hubs\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
