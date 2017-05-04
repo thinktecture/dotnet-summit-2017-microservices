@@ -40,7 +40,6 @@ let busConfig: IBusConfig = {
     vhost: ''
 };
 
-let consumerCancellers: IConsumerDispose[] = [];
 let bus = RabbitHutch.CreateBus(busConfig);
 bus.Subscribe(NewOrderMessage, 'shipping', (message: NewOrderMessage) => {
     console.log('#Got an Order message:');
@@ -52,8 +51,7 @@ bus.Subscribe(NewOrderMessage, 'shipping', (message: NewOrderMessage) => {
         bus.Publish(new ShippingCreatedMessage(messageId, new Date(), message.Order.Id, message.UserId))
             .then(success => console.log(`#Message ${messageId} was ${success ? "" : "not "}published`));
     }, 5000);
-}).then((canceller: IConsumerDispose) => consumerCancellers.push(canceller));
-
+});
 
 // Restify Web API
 export let server = restify.createServer({
@@ -70,10 +68,3 @@ server.get('/api/ping', new StatusController().get);
 server.listen(settings.port, function () {
     console.log('Shipping Service running - listening at %s', server.url);
 });
-
-// TODO: cleanup
-/*
- service.deregister('shipping', data => {
-     console.log("From Consul: " + data)
- });
-*/
