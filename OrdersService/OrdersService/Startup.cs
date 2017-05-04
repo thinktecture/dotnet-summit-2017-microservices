@@ -4,6 +4,7 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using IdentityServer3.AccessTokenValidation;
 using Microsoft.Owin.Cors;
+using OrdersService.AuthZ;
 using OrdersService.Logging;
 using Owin;
 using Serilog;

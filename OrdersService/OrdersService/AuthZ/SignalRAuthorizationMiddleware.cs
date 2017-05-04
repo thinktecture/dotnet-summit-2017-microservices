@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Owin;
 
-namespace OrdersService
+namespace OrdersService.AuthZ
 {
     public class SignalRAuthorizationMiddleware : OwinMiddleware
     {

@@ -502,7 +502,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="SignalRAuthorizationMiddleware.cs" />
+    <Compile Include="AuthZ\SignalRAuthorizationMiddleware.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Discovery\CustomWebApiRegistryTenant.cs" />
   </ItemGroup>
