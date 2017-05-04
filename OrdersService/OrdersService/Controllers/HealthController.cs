@@ -6,6 +6,7 @@ namespace OrdersService.Controllers
     public class HealthController : ApiController
     {
         [HttpGet]
+        [AllowAnonymous]
         [Route("ping")]
         public string Ping()
         {

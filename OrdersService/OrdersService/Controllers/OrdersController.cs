@@ -2,10 +2,17 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using OrdersService.DTOs;
+using AutoMapper;
+using EasyNetQ;
+using Microsoft.AspNet.SignalR;
+using OrdersService.Hubs;
+using OrdersService.Properties;
+using QueuingMessages;
+using Order = OrdersService.DTOs.Order;
 
 namespace OrdersService.Controllers
 {
@@ -34,6 +41,25 @@ namespace OrdersService.Controllers
             newOrder.Id = orderId;
 
             Database.TryAdd(orderId, newOrder);
+
+            using (var bus = RabbitHutch.CreateBus(Settings.Default.RabbitMqConnectionString))
+            {
+                var identity = User.Identity as ClaimsIdentity;
+                var subjectId = identity?.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+
+                // TODO: re-think data/message shapes, coupling, and mapping <- pragmatic?
+                var message = new NewOrderMessage
+                {
+                    UserId = subjectId,
+                    Order = Mapper.Map<QueuingMessages.Order>(newOrder)
+                };
+                
+                bus.Publish(message);
+
+                GlobalHost.ConnectionManager.GetHubContext<OrdersHub>()
+                     .Clients.Group(message.UserId)
+                     .orderCreated();
+            }
         }
     }
 }

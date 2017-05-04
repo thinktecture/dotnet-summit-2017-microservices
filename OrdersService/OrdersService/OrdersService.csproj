@@ -491,6 +491,7 @@
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="DTOs\Order.cs" />
     <Compile Include="DTOs\OrderItem.cs" />
+    <Compile Include="Hubs\OrdersHub.cs" />
     <Compile Include="Logging\MessageHandler.cs" />
     <Compile Include="Logging\MessageLoggingHandler.cs" />
     <Compile Include="OrdersServiceHost.cs" />
@@ -526,8 +527,6 @@
       <Name>QueuingMessages</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Hubs\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

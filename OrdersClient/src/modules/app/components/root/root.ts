@@ -12,7 +12,7 @@ export class RootComponent {
   constructor(private _securityService: SecurityService, private _pushService: PushService,  private _desktopIntegration: DesktopIntegrationService) {
     this._securityService.activateSession()
       .subscribe(() => {
-        //this._pushService.start();
+        this._pushService.start();
       });
 
     this._desktopIntegration.register();
