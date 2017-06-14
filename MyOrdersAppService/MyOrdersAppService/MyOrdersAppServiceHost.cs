@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Owin.Hosting;
+using MyOrdersAppService.Properties;
 
 namespace MyOrdersAppService
 {
@@ -9,15 +10,12 @@ namespace MyOrdersAppService
 
         public void Start()
         {
-            _server = WebApp.Start<Startup>("http://localhost:4500");
+            _server = WebApp.Start<Startup>(Settings.Default.SelfHostBaseUrl);
         }
 
         public void Stop()
         {
-            if (_server != null)
-            {
-                _server.Dispose();
-            }
+            _server?.Dispose();
         }
     }
 }
