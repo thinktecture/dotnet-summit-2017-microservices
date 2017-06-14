@@ -5,5 +5,17 @@
     <Setting Name="RabbitMqConnectionString" Type="System.String" Scope="User">
       <Value Profile="(Default)">host=localhost</Value>
     </Setting>
+    <Setting Name="WebApiBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:7777</Value>
+    </Setting>
+    <Setting Name="WebApiHealthUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:7777/api/health/ping</Value>
+    </Setting>
+    <Setting Name="SeqBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:5341</Value>
+    </Setting>
+    <Setting Name="IdSrvBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:5000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

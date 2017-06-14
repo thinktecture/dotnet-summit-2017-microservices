@@ -6,8 +6,8 @@ using IdentityServer3.AccessTokenValidation;
 using Microsoft.Owin.Cors;
 using OrdersService.AuthZ;
 using OrdersService.Logging;
+using OrdersService.Properties;
 using Owin;
-using Serilog;
 using Swashbuckle.Application;
 
 namespace OrdersService
@@ -15,20 +15,14 @@ namespace OrdersService
     class Startup
     {
         public void Configuration(IAppBuilder app)
-        {
-            Log.Logger = new LoggerConfiguration()
-                .Enrich
-                .FromLogContext()
-                .WriteTo.Seq("http://localhost:5341")
-                .CreateLogger();
-            
+        {   
             JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
 
             app.Use(typeof(SignalRAuthorizationMiddleware));
 
             app.UseIdentityServerBearerTokenAuthentication(new IdentityServerBearerTokenAuthenticationOptions
             {
-                Authority = "http://localhost:5000",
+                Authority = Settings.Default.IdSrvBaseUrl,
                 RequiredScopes = new List<string> { "ordersapi" }
             });
 

@@ -28,7 +28,7 @@ namespace OrdersService.Controllers
         [Route]
         public List<Order> GetOrders()
         {
-            return Datastore.Values.ToList();
+            return Datastore.Values.OrderByDescending(o => o.Created).ToList();
         }
 
         [HttpPost]

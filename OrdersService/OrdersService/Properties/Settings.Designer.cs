@@ -34,5 +34,53 @@ namespace OrdersService.Properties {
                 this["RabbitMqConnectionString"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:7777")]
+        public string WebApiBaseUrl {
+            get {
+                return ((string)(this["WebApiBaseUrl"]));
+            }
+            set {
+                this["WebApiBaseUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:7777/api/health/ping")]
+        public string WebApiHealthUrl {
+            get {
+                return ((string)(this["WebApiHealthUrl"]));
+            }
+            set {
+                this["WebApiHealthUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5341")]
+        public string SeqBaseUrl {
+            get {
+                return ((string)(this["SeqBaseUrl"]));
+            }
+            set {
+                this["SeqBaseUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:5000")]
+        public string IdSrvBaseUrl {
+            get {
+                return ((string)(this["IdSrvBaseUrl"]));
+            }
+            set {
+                this["IdSrvBaseUrl"] = value;
+            }
+        }
     }
 }

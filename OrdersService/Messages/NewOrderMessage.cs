@@ -1,7 +1,4 @@
-﻿using System;
-using EasyNetQ;
-
-namespace QueuingMessages
+﻿namespace QueuingMessages
 {
     public class NewOrderMessage
     {

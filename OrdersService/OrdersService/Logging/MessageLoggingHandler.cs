@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Serilog;
@@ -11,7 +10,6 @@ namespace OrdersService.Logging
         {
             await Task.Run(() =>
             {
-                //Debug.WriteLine($"{correlationId} - Request: {requestInfo}\r\n{Encoding.UTF8.GetString(message)}");
                 Log.Information($"{correlationId} - Request: {requestInfo}\r\n{Encoding.UTF8.GetString(message)}");
             });
         }
@@ -20,7 +18,6 @@ namespace OrdersService.Logging
         {
             await Task.Run(() =>
             {
-                //Debug.WriteLine($"{correlationId} - Response: {responseInfo}\r\n{Encoding.UTF8.GetString(message)}");
                 Log.Information($"{correlationId} - Response: {responseInfo}\r\n{Encoding.UTF8.GetString(message)}");
             });
         }

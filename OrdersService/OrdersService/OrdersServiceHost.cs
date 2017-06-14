@@ -10,7 +10,9 @@ using Nanophone.RegistryHost.ConsulRegistry;
 using OrdersService.Discovery;
 using OrdersService.Hubs;
 using OrdersService.Properties;
+using Polly;
 using QueuingMessages;
+using Serilog;
 using Order = OrdersService.DTOs.Order;
 using OrderItem = OrdersService.DTOs.OrderItem;
 
@@ -25,24 +27,15 @@ namespace OrdersService
 
         public void Start()
         {
-            var baseUrl = new Uri("http://localhost:7777");
-            var healthUrl = new Uri("http://localhost:7777/api/health/ping");
+            var baseUrl = new Uri(Settings.Default.WebApiBaseUrl);
+            var healthUrl = new Uri(Settings.Default.WebApiHealthUrl);
 
+            ConfigureLogging();
             WireAppDomainHandlers();
             InitializeMapper();
             SetupQueues();
             ListenOnQueues();
-
-            var registryHost = new ConsulRegistryHost();
-            _serviceRegistry = new ServiceRegistry(registryHost);
-
-            Task.Run(async () =>
-            {
-                _registryInformation = await _serviceRegistry.AddTenantAsync(new CustomWebApiRegistryTenant(baseUrl), "orders", "0.0.2", healthUrl);
-
-                _server = WebApp.Start<Startup>(baseUrl.ToString());
-                Console.WriteLine("Orders Service running - listening at {0} ...", baseUrl);
-            }).GetAwaiter().GetResult();
+            StartWebApi(baseUrl, healthUrl);
         }
 
         public void Stop()
@@ -53,17 +46,44 @@ namespace OrdersService
             _server?.Dispose();
         }
 
+        private static void ConfigureLogging()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .Enrich
+                .FromLogContext()
+                .WriteTo.LiterateConsole()
+                .WriteTo.Seq(Settings.Default.SeqBaseUrl)
+                .CreateLogger();
+        }
+
         private static void SetupQueues()
         {
-            using (var advancedBus = RabbitHutch.CreateBus(Settings.Default.RabbitMqConnectionString).Advanced)
-            {
-                var newOrderQueue = advancedBus.QueueDeclare("QueuingMessages.NewOrderMessage:QueuingMessages_shipping");
-                var newOrderExchange = advancedBus.ExchangeDeclare("QueuingMessages.NewOrderMessage:QueuingMessages", ExchangeType.Topic);
-                advancedBus.Bind(newOrderExchange, newOrderQueue, String.Empty);
+            var retryPolicy = Policy.Handle<TimeoutException>()
+                .Retry(3, (exception, retryCount) =>
+                {
+                    Log.Warning($"Tried to connect to RMQ - {0} time(s) - reason: {1}", retryCount, exception);
+                });
 
-                var shippingCreatedQueue = advancedBus.QueueDeclare("QueuingMessages.ShippingCreatedMessage:QueuingMessages_shipping");
-                var shippingCreatedExchange = advancedBus.ExchangeDeclare("QueuingMessages.ShippingCreatedMessage:QueuingMessages", ExchangeType.Topic);
-                advancedBus.Bind(shippingCreatedExchange, shippingCreatedQueue, String.Empty);
+            try
+            {
+                retryPolicy.Execute(() =>
+                {
+                    using (var advancedBus = RabbitHutch.CreateBus(Settings.Default.RabbitMqConnectionString).Advanced)
+                    {
+                        var newOrderQueue = advancedBus.QueueDeclare("QueuingMessages.NewOrderMessage:QueuingMessages_shipping");
+                        var newOrderExchange = advancedBus.ExchangeDeclare("QueuingMessages.NewOrderMessage:QueuingMessages", ExchangeType.Topic);
+                        advancedBus.Bind(newOrderExchange, newOrderQueue, String.Empty);
+
+                        var shippingCreatedQueue = advancedBus.QueueDeclare("QueuingMessages.ShippingCreatedMessage:QueuingMessages_shipping");
+                        var shippingCreatedExchange = advancedBus.ExchangeDeclare("QueuingMessages.ShippingCreatedMessage:QueuingMessages", ExchangeType.Topic);
+                        advancedBus.Bind(shippingCreatedExchange, shippingCreatedQueue, String.Empty);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Could not connect to RMQ - reason: {0}", e);
+                throw;
             }
         }
 
@@ -74,7 +94,7 @@ namespace OrdersService
             // TODO think about async subscribing
             _bus.Subscribe<ShippingCreatedMessage>("shipping", msg =>
             {
-                Console.WriteLine("#Shipping created: " + msg.Created + " for " + msg.OrderId);
+                Log.Information("###Shipping created: " + msg.Created + " for " + msg.OrderId);
 
                 GlobalHost.ConnectionManager.GetHubContext<OrdersHub>()
                    .Clients.Group(msg.UserId)
@@ -98,6 +118,20 @@ namespace OrdersService
                     .ForMember(d => d.Items, opt => opt.MapFrom(s => s.Items));
             });
             Mapper.AssertConfigurationIsValid();
+        }
+
+        private static void StartWebApi(Uri baseUrl, Uri healthUrl)
+        {
+            var registryHost = new ConsulRegistryHost();
+            _serviceRegistry = new ServiceRegistry(registryHost);
+
+            Task.Run(async () =>
+            {
+                _registryInformation = await _serviceRegistry.AddTenantAsync(new CustomWebApiRegistryTenant(baseUrl), "orders", "0.0.2", healthUrl);
+
+                _server = WebApp.Start<Startup>(baseUrl.ToString());
+                Log.Information("Orders Service running - listening at {0} ...", baseUrl);
+            }).GetAwaiter().GetResult();
         }
 
         private static async void CurrentDomain_ProcessExit(object sender, EventArgs e)

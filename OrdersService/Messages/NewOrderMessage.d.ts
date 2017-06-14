@@ -2,7 +2,7 @@ declare module server {
 	interface newOrderMessage {
 		order: {
 			id: any;
-			dateTime: Date;
+			created: Date;
 			items: any[];
 		};
 		userId: string;
