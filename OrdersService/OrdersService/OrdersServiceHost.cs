@@ -27,15 +27,16 @@ namespace OrdersService
 
         public void Start()
         {
-            var baseUrl = new Uri(Settings.Default.WebApiBaseUrl);
-            var healthUrl = new Uri(Settings.Default.WebApiHealthUrl);
+            var hostBaseUrl = Settings.Default.SelfHostBaseUrl;
+            var webApiBaseUrl = Settings.Default.WebApiBaseUrl;
+            var healthUrl = Settings.Default.WebApiHealthUrl;
 
             ConfigureLogging();
             WireAppDomainHandlers();
             InitializeMapper();
             SetupQueues();
             ListenOnQueues();
-            StartWebApi(baseUrl, healthUrl);
+            StartWebApi(hostBaseUrl, webApiBaseUrl, healthUrl);
         }
 
         public void Stop()
@@ -51,7 +52,7 @@ namespace OrdersService
             Log.Logger = new LoggerConfiguration()
                 .Enrich
                 .FromLogContext()
-                .WriteTo.LiterateConsole()
+                //.WriteTo.LiterateConsole()
                 .WriteTo.Seq(Settings.Default.SeqBaseUrl)
                 .CreateLogger();
         }
@@ -120,17 +121,17 @@ namespace OrdersService
             Mapper.AssertConfigurationIsValid();
         }
 
-        private static void StartWebApi(Uri baseUrl, Uri healthUrl)
+        private static void StartWebApi(string hostBaseUrl, string webApiBaseUrl, string healthUrl)
         {
             var registryHost = new ConsulRegistryHost();
             _serviceRegistry = new ServiceRegistry(registryHost);
 
             Task.Run(async () =>
             {
-                _registryInformation = await _serviceRegistry.AddTenantAsync(new CustomWebApiRegistryTenant(baseUrl), "orders", "0.0.2", healthUrl);
+                _registryInformation = await _serviceRegistry.AddTenantAsync(new CustomWebApiRegistryTenant(new Uri(webApiBaseUrl)), "orders", "0.0.2", new Uri(healthUrl));
 
-                _server = WebApp.Start<Startup>(baseUrl.ToString());
-                Log.Information("Orders Service running - listening at {0} ...", baseUrl);
+                _server = WebApp.Start<Startup>(hostBaseUrl);
+                Log.Information("Orders Service running - listening at {0} ...", hostBaseUrl);
             }).GetAwaiter().GetResult();
         }
 

@@ -37,7 +37,7 @@ namespace OrdersService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:7777")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:7777/")]
         public string WebApiBaseUrl {
             get {
                 return ((string)(this["WebApiBaseUrl"]));
@@ -80,6 +80,18 @@ namespace OrdersService.Properties {
             }
             set {
                 this["IdSrvBaseUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://*:7777/")]
+        public string SelfHostBaseUrl {
+            get {
+                return ((string)(this["SelfHostBaseUrl"]));
+            }
+            set {
+                this["SelfHostBaseUrl"] = value;
             }
         }
     }
