@@ -10,6 +10,7 @@ using Microsoft.AspNet.SignalR;
 using OrdersService.Hubs;
 using OrdersService.Properties;
 using QueuingMessages;
+using Serilog;
 using Order = OrdersService.DTOs.Order;
 
 namespace OrdersService.Controllers
@@ -28,7 +29,17 @@ namespace OrdersService.Controllers
         [Route]
         public List<Order> GetOrders()
         {
-            return Datastore.Values.OrderByDescending(o => o.Created).ToList();
+            try
+            {
+                return Datastore.Values.OrderByDescending(o => o.Created).ToList();
+            }
+            catch (Exception e)
+            {
+                string message = "We could not retrieve the list of orders.";
+                Log.Error(message + $" Reason: {0}", e);
+
+                throw new OrderServiceException(message);
+            }
         }
 
         [HttpPost]
@@ -38,20 +49,31 @@ namespace OrdersService.Controllers
             var orderId = Guid.NewGuid();
             newOrder.Id = orderId;
 
-            Datastore.TryAdd(orderId, newOrder);
+            try
+            {
+                Datastore.TryAdd(orderId, newOrder);
+            }
+            catch (Exception e)
+            {
+                string message = "We could not add the new order.";
+                Log.Error(message + $" Reason: {0}", e);
 
+                throw new OrderServiceException(message);
+            }
+
+            // TODO: Retry & exception handling
             using (var bus = RabbitHutch.CreateBus(Settings.Default.RabbitMqConnectionString))
             {
                 var identity = User.Identity as ClaimsIdentity;
                 var subjectId = identity?.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
 
-                // TODO: re-think data/message shapes, coupling, and mapping <- pragmatic?
                 var message = new NewOrderMessage
                 {
                     UserId = subjectId,
                     Order = Mapper.Map<QueuingMessages.Order>(newOrder)
                 };
 
+                // TODO: Exception handling
                 bus.Publish(message);
 
                 GlobalHost.ConnectionManager.GetHubContext<OrdersHub>()

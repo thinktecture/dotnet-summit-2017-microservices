@@ -91,8 +91,7 @@ namespace OrdersService
         private void ListenOnQueues()
         {
             _bus = RabbitHutch.CreateBus(Settings.Default.RabbitMqConnectionString);
-
-            // TODO think about async subscribing
+            
             _bus.Subscribe<ShippingCreatedMessage>("shipping", msg =>
             {
                 Log.Information("###Shipping created: " + msg.Created + " for " + msg.OrderId);

@@ -493,6 +493,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\OrderServiceException.cs" />
     <Compile Include="Logging\MessageHandler.cs" />
     <Compile Include="Controllers\HealthController.cs" />
     <Compile Include="DTOs\Order.cs" />

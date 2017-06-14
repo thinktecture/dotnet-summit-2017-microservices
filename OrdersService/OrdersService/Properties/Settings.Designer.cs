@@ -49,7 +49,7 @@ namespace OrdersService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:7777/api/health/ping")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://10.0.75.1:7777/api/health/ping")]
         public string WebApiHealthUrl {
             get {
                 return ((string)(this["WebApiHealthUrl"]));
