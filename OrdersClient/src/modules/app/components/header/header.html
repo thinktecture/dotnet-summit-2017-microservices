@@ -4,4 +4,8 @@
 
 <app-menu></app-menu>
 
-<img src="assets/logo.svg" class="brand-logo" />
+<div *ngIf="isLoggedIn" class="brand-logo">
+  <i class="fa fa-sign-out" (click)="logout()"></i>
+</div>
+
+<img *ngIf="!isLoggedIn" src="assets/logo.svg" class="brand-logo" />

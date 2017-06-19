@@ -13,6 +13,7 @@ import {AuthenticatedHttpService} from './authenticatedHttpService';
 import {User} from '../models/user';
 import {SecurityConfiguration} from '../models/securityConfiguration';
 import {StorageService} from './storageService';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 const ACCESS_TOKEN_STORAGE_KEY: string = 'accessToken';
 
@@ -22,6 +23,8 @@ export class SecurityService {
   private _activateSessionObservable: Observable<any>;
   private _accessToken: string;
   private _user: User;
+
+  public userLoggedIn: BehaviorSubject<string> = new BehaviorSubject(null);
 
   public get accessToken(): string {
     return this._accessToken;
@@ -101,11 +104,20 @@ export class SecurityService {
     }
 
     return this._activateSessionObservable = this._storageService.load<string>(ACCESS_TOKEN_STORAGE_KEY)
-      .map(accessToken => this._accessToken = accessToken)
-      .switchMap(() => Observable.of(true))
+      .map(accessToken => {
+        this._accessToken = accessToken;
+        this.userLoggedIn.next(accessToken);
+      })
+      .switchMap(() => this.loadUserInformation())
       .finally(() => this._activateSessionObservable = void 0)
       .catch(() => Observable.of(false))
       .share();
+  }
+
+  private loadUserInformation(): Observable<any> {
+    return this.getAuthenticatedHttpService().get(`${this._configuration.authorityUrl}connect/userinfo`)
+      .map((response: Response) => response.json())
+      .map(user => this._user = User.fromPojo(user));
   }
 
   private revokeToken(): Observable<any> {
